@@ -20,7 +20,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASS }}
           script: |
-            cd /root/TalleFinal-Devops   # Ajusta a la carpeta real
+            cd /root/proyecto
             git pull origin main
             docker-compose down
             docker-compose up -d --build
+
