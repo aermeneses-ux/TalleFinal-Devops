@@ -27,7 +27,7 @@ services:
       - portainer_data:/data
 
   frontend:
-    build: ./frontend
+    build: ./project-devops-front
     container_name: angular_frontend
     labels:
       - "traefik.enable=true"
@@ -35,7 +35,7 @@ services:
       - "traefik.http.routers.frontend.entrypoints=web"
 
   backend:
-    build: ./backend
+    build: ./project-devops-back
     container_name: laravel_backend
     environment:
       DB_CONNECTION: pgsql
