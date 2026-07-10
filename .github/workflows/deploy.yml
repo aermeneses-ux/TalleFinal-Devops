@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main # Se ejecuta cuando haces push a la rama main
+      - main   # Se ejecuta cuando haces push a la rama main
 
 jobs:
   deploy:
