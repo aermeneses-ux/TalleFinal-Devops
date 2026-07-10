@@ -31,7 +31,7 @@ services:
     container_name: angular_frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`poyumbo.byronm.com`)"
+      - "traefik.http.routers.frontend.rule=Host(`yumbo.byronm.com`)"
       - "traefik.http.routers.frontend.entrypoints=web"
 
   backend:
@@ -71,7 +71,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`yumbo.byronm.com`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgyumbo.byronm.com`)"
       - "traefik.http.routers.pgadmin.entrypoints=web"
 
 volumes:

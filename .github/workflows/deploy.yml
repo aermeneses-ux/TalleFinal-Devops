@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main   # Se ejecuta cuando haces push a la rama main
+      - main
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASS }}
           script: |
-            cd /root/proyecto
+            cd /root/TalleFinal-Devops   # Ajusta a la carpeta real
             git pull origin main
             docker-compose down
             docker-compose up -d --build
