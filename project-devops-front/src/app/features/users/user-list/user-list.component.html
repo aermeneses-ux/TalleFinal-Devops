@@ -1,0 +1,53 @@
+<div class="main-container">
+  
+  <div class="card header-card">
+    <h2>Gestión de Usuarios</h2>
+    <button class="btn btn-primary" (click)="openCreateForm()">
+      <span class="icon">+</span> Nuevo Usuario
+    </button>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td class="font-semibold">{{ user.name }}</td>
+              <td class="text-muted">{{ user.email }}</td>
+              <td>
+                <span class="badge" [ngClass]="user.role">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>
+                <div class="actions-wrapper">
+                  <button class="btn btn-edit" (click)="openEditForm(user)">Editar</button>
+                  <button class="btn btn-delete" (click)="deleteUser(user.id!)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty-state">
+                No hay usuarios registrados en el sistema.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (isFormOpen) {
+    <app-user-form [userToEdit]="selectedUser" (onClose)="closeForm()"></app-user-form>
+  }
+</div>
