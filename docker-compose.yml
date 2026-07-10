@@ -20,7 +20,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portaineryumbo.byronm.com`)"
+      - "traefik.http.routers.portainer.rule=Host(`portaineryumbo.byronrm.com`)"
       - "traefik.http.routers.portainer.entrypoints=web"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -31,7 +31,7 @@ services:
     container_name: angular_frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`yumbo.byronm.com`)"
+      - "traefik.http.routers.frontend.rule=Host(`yumbo.byronrm.com`)"
       - "traefik.http.routers.frontend.entrypoints=web"
 
   backend:
@@ -46,7 +46,7 @@ services:
       DB_PASSWORD: postgres
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`backyumbo.byronm.com`)"
+      - "traefik.http.routers.backend.rule=Host(`backyumbo.byronrm.com`)"
       - "traefik.http.routers.backend.entrypoints=web"
     depends_on:
       - db
@@ -71,7 +71,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgyumbo.byronm.com`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgyumbo.byronrm.com`)"
       - "traefik.http.routers.pgadmin.entrypoints=web"
 
 volumes:
