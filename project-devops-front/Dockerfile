@@ -8,5 +8,11 @@ RUN npm run build --prod
 
 # Etapa 2: Servir con Nginx
 FROM nginx:stable-alpine
-COPY --from=build /app/dist/project-devops-front /usr/share/nginx/html
+
+# Limpiamos cualquier archivo por defecto que traiga Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copiamos apuntando a la subcarpeta browser
+COPY --from=build /app/dist/project-devops-front/browser /usr/share/nginx/html
+
 EXPOSE 80
