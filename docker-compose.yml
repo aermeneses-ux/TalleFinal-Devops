@@ -7,30 +7,22 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false" # Mayor seguridad
+      - "--providers.docker.exposedbydefault=false"
+      # Entrypoints para tráfico normal (80) y seguro (443)
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Configuración del generador automático de certificados (Let's Encrypt)
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=tu-correo@gmail.com" # 👈 PON TU CORREO REAL AQUÍ
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--log.level=DEBUG"
-
     ports:
       - "80:80"
-      - "8080:8080" # Panel de Traefik
+      - "443:443"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - proxy-net
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: always
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portaineryumbo.byronrm.com`)"
-      - "traefik.http.routers.portainer.entrypoints=web"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000" # Puerto interno de Portainer
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - ./letsencrypt:/letsencrypt
     networks:
       - proxy-net
 
@@ -39,9 +31,18 @@ services:
     container_name: angular_frontend
     labels:
       - "traefik.enable=true"
+      # Enrutador Seguro (HTTPS)
       - "traefik.http.routers.frontend.rule=Host(`yumbo.byronrm.com`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80" # Ajusta si tu nginx/angular interno usa otro puerto (ej. 4200)
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      # Redirección Automática de HTTP a HTTPS
+      - "traefik.http.routers.frontend-http.rule=Host(`yumbo.byronrm.com`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
+      # Middleware global de redirección
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     networks:
       - proxy-net
 
@@ -57,11 +58,40 @@ services:
       DB_PASSWORD: postgres
     labels:
       - "traefik.enable=true"
+      # Enrutador Seguro (HTTPS)
       - "traefik.http.routers.backend.rule=Host(`backyumbo.byronrm.com`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000" # Ajusta al puerto que use tu Laravel (ej. 80 o 8000)
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      # Redirección Automática de HTTP a HTTPS
+      - "traefik.http.routers.backend-http.rule=Host(`backyumbo.byronrm.com`)"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+      - "traefik.http.routers.backend-http.middlewares=redirect-to-https"
     depends_on:
       - db
+    networks:
+      - proxy-net
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      # Enrutador Seguro (HTTPS)
+      - "traefik.http.routers.portainer.rule=Host(`portaineryumbo.byronrm.com`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=myresolver"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      # Redirección Automática de HTTP a HTTPS
+      - "traefik.http.routers.portainer-http.rule=Host(`portaineryumbo.byronrm.com`)"
+      - "traefik.http.routers.portainer-http.entrypoints=web"
+      - "traefik.http.routers.portainer-http.middlewares=redirect-to-https"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
     networks:
       - proxy-net
 
@@ -87,9 +117,16 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     labels:
       - "traefik.enable=true"
+      # Enrutador Seguro (HTTPS)
       - "traefik.http.routers.pgadmin.rule=Host(`pgyumbo.byronrm.com`)"
-      - "traefik.http.routers.pgadmin.entrypoints=web"
-      - "traefik.http.services.pgadmin.loadbalancer.server.port=80" # Puerto interno de pgAdmin
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls=true"
+      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+      # Redirección Automática de HTTP a HTTPS
+      - "traefik.http.routers.pgadmin-http.rule=Host(`pgyumbo.byronrm.com`)"
+      - "traefik.http.routers.pgadmin-http.entrypoints=web"
+      - "traefik.http.routers.pgadmin-http.middlewares=redirect-to-https"
     networks:
       - proxy-net
 
