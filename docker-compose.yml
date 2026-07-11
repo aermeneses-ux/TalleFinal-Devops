@@ -7,16 +7,18 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false" # Mayor seguridad
       - "--entrypoints.web.address=:80"
       - "--log.level=DEBUG"
     environment:
       - DOCKER_API_VERSION=1.40
-
     ports:
       - "80:80"
       - "8080:8080" # Panel de Traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy-net
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -26,9 +28,12 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.portainer.rule=Host(`portaineryumbo.byronrm.com`)"
       - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000" # Puerto interno de Portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    networks:
+      - proxy-net
 
   frontend:
     build: ./project-devops-front
@@ -37,6 +42,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`yumbo.byronrm.com`)"
       - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80" # Ajusta si tu nginx/angular interno usa otro puerto (ej. 4200)
+    networks:
+      - proxy-net
 
   backend:
     build: ./project-devops-back
@@ -52,8 +60,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`backyumbo.byronrm.com`)"
       - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000" # Ajusta al puerto que use tu Laravel (ej. 80 o 8000)
     depends_on:
       - db
+    networks:
+      - proxy-net
 
   db:
     image: postgres:15
@@ -65,6 +76,8 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - proxy-net
 
   pgadmin:
     image: dpage/pgadmin4
@@ -77,7 +90,14 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.pgadmin.rule=Host(`pgyumbo.byronrm.com`)"
       - "traefik.http.routers.pgadmin.entrypoints=web"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80" # Puerto interno de pgAdmin
+    networks:
+      - proxy-net
 
 volumes:
   portainer_data:
   postgres_data:
+
+networks:
+  proxy-net:
+    driver: bridge
