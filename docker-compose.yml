@@ -8,10 +8,11 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false" # Mayor seguridad
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.apiVersioning=true"
       - "--entrypoints.web.address=:80"
       - "--log.level=DEBUG"
-    environment:
-      - DOCKER_API_VERSION=1.41
+
     ports:
       - "80:80"
       - "8080:8080" # Panel de Traefik
