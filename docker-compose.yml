@@ -10,8 +10,6 @@ services:
       - "--providers.docker.exposedbydefault=false" # Mayor seguridad
       - "--entrypoints.web.address=:80"
       - "--log.level=DEBUG"
-    environment:
-      - DOCKER_API_VERSION=1.40
     ports:
       - "80:80"
       - "8080:8080" # Panel de Traefik
