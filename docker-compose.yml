@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     container_name: traefik
     command:
       - "--api.insecure=true"
@@ -12,6 +12,8 @@ services:
       - "--providers.docker.apiVersioning=true"
       - "--entrypoints.web.address=:80"
       - "--log.level=DEBUG"
+    environment:
+      - DOCKER_API_VERSION=1.40
 
     ports:
       - "80:80"
