@@ -21,6 +21,11 @@ export class UserService {
       this.usersState.set(data);
     });
   }
+  
+  getUsers() {
+    return this.users();
+  }
+
 
   getUserById(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
