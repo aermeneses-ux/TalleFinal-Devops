@@ -13,7 +13,7 @@ services:
       - "--entrypoints.websecure.address=:443"
       # Configuración del generador automático de certificados (Let's Encrypt)
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=tu-correo@gmail.com" # 👈 PON TU CORREO REAL AQUÍ
+      - "--certificatesresolvers.myresolver.acme.aer.meneses@yavirac.edu.ec" # 👈 PON TU CORREO REAL AQUÍ
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--log.level=DEBUG"
     ports:
