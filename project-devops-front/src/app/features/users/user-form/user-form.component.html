@@ -1,44 +1,131 @@
-<div class="modal-overlay">
-  <div class="modal-card">
-    <h3>{{ userToEdit ? '✏️ Editar Usuario' : '👤 Crear Usuario' }}</h3>
-    <hr class="divider">
+<p-dialog
+  [visible]="true"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="userToEdit ? 'Editar Usuario' : 'Nuevo Usuario'"
+>
 
-    <form [formGroup]="userForm" (ngSubmit)="saveUser()">
-      <div class="form-grid">
-        
-        <div class="form-group">
-          <label>Nombre completo</label>
-          <input type="text" formControlName="name" placeholder="Ej. Juan Pérez">
-          @if (userForm.get('name')?.touched && userForm.get('name')?.invalid) {
-            <small class="error-text">El nombre es requerido (mín. 3 caracteres).</small>
-          }
+  <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+
+    <div class="form-grid">
+
+        <div class="field">
+            <label>Nombre</label>
+            <input pInputText formControlName="name">
         </div>
 
-        <div class="form-group">
-          <label>Correo Electrónico</label>
-          <input type="email" formControlName="email" placeholder="juan@ejemplo.com">
-          @if (userForm.get('email')?.touched && userForm.get('email')?.invalid) {
-            <small class="error-text">Ingresa un correo electrónico válido.</small>
-          }
+        <div class="field">
+            <label>Email</label>
+            <input pInputText formControlName="email">
         </div>
 
-        <div class="form-group">
-          <label>Rol de Usuario</label>
-          <div class="select-wrapper">
-            <select formControlName="role">
-              <option value="Admin">Admin</option>
-              <option value="User">User</option>
-              <option value="Guest">Guest</option>
-            </select>
-          </div>
+        <div class="field">
+            <label>Rol</label>
+
+            <p-select
+                [options]="roles"
+                optionLabel="label"
+                optionValue="value"
+                formControlName="role">
+            </p-select>
         </div>
 
-      </div>
+        <div class="field">
+            <label>Estado</label>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-cancel" (click)="onClose.emit()">Cancelar</button>
-        <button type="submit" class="btn btn-save" [disabled]="userForm.invalid">Guardar Usuario</button>
-      </div>
-    </form>
-  </div>
-</div>
+            <p-select
+                [options]="estados"
+                optionLabel="label"
+                optionValue="value"
+                formControlName="status">
+            </p-select>
+        </div>
+
+        <div class="field full">
+            <label>Fecha de nacimiento</label>
+
+            <p-datepicker
+                formControlName="birthDate"
+                dateFormat="dd/mm/yy"
+                appendTo="body">
+            </p-datepicker>
+        </div>
+
+        <div class="field">
+
+            <label>Tipo de contrato</label>
+
+            <div class="options">
+
+                @for(c of contratos; track c){
+
+                <div class="option">
+
+                    <p-radiobutton
+                        [value]="c.value"
+                        formControlName="contractType">
+                    </p-radiobutton>
+
+                    <label>{{c.label}}</label>
+
+                </div>
+
+                }
+
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label>Módulos</label>
+
+            <div class="options">
+
+                @for(m of modulos; track m){
+
+                <div class="option">
+
+                    <p-checkbox
+                        [value]="m"
+                        formControlName="permissions">
+                    </p-checkbox>
+
+                    <label>{{m}}</label>
+
+                </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+        <button
+            type="button"
+            pButton
+            severity="secondary"
+            label="Cancelar"
+            (click)="onClose.emit()">
+        </button>
+
+        <button
+            type="submit"
+            pButton
+            icon="pi pi-save"
+            label="Guardar"
+            [disabled]="userForm.invalid">
+        </button>
+
+    </div>
+
+</form>
+
+</p-dialog>
