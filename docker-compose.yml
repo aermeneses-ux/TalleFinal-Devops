@@ -50,6 +50,10 @@ services:
     build: ./project-devops-back
     container_name: laravel_backend
     environment:
+      APP_KEY: "base64:oC4Fq/70x9mZusjDo/lS8zJ8qoy+gkYB+zq824+pVxI=" # 👈 ¡Agrega esta línea!
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: https://backyumbo.byronrm.com
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
