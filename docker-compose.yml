@@ -50,7 +50,7 @@ services:
     build: ./project-devops-back
     container_name: laravel_backend
     environment:
-      APP_KEY: "base64:oC4Fq/70x9mZusjDo/lS8zJ8qoy+gkYB+zq824+pVxI=" # 👈 ¡Agrega esta línea!
+      APP_KEY: "base64:oC4Fq/70x9mZusjDo/lS8zJ8qoy+gkYB+zq824+pVxI="
       APP_ENV: production
       APP_DEBUG: "false"
       APP_URL: https://backyumbo.byronrm.com
@@ -72,6 +72,14 @@ services:
       - "traefik.http.routers.backend-http.rule=Host(`backyumbo.byronrm.com`)"
       - "traefik.http.routers.backend-http.entrypoints=web"
       - "traefik.http.routers.backend-http.middlewares=redirect-to-https"
+
+      # === 🚀 MIDDLEWARES DE CORS PARA EVITAR EL BLOQUEO EN EL FRONTEND ===
+      - "traefik.http.routers.backend.middlewares=cors-headers@docker"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolalloworiginlist=https://yumbo.byronrm.com"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowheaders=Origin,Authorization,Content-Type,Accept,X-Requested-With"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.cors-headers.headers.addvaryheader=true"
     depends_on:
       - db
     networks:
@@ -121,6 +129,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
+      # Evita que te pida crear una contraseña maestra de nuevo
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
     labels:
       - "traefik.enable=true"
       # Enrutador Seguro (HTTPS)
@@ -133,12 +143,17 @@ services:
       - "traefik.http.routers.pgadmin-http.rule=Host(`pgyumbo.byronrm.com`)"
       - "traefik.http.routers.pgadmin-http.entrypoints=web"
       - "traefik.http.routers.pgadmin-http.middlewares=redirect-to-https"
+    # === 🚀 SOLUCIÓN: PERSISTENCIA PARA PGADMIN ===
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - proxy-net
 
+# === 🚀 SOLUCIÓN: AGREGAMOS EL VOLUMEN AQUÍ ===
 volumes:
   portainer_data:
   postgres_data:
+  pgadmin_data: # 👈 ¡Este volumen guardará tus servidores y configuraciones!
 
 networks:
   proxy-net:
