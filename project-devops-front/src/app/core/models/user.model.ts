@@ -5,7 +5,7 @@ export interface User {
   email: string;
   role: 'Admin' | 'User' | 'Guest';
   status: 'Activo' | 'Inactivo';
-  birthDate: string;           // <-- Nuevo: Calendario
-  contractType: string;        // <-- Nuevo: Radio button
-  permissions: string[];       // <-- Nuevo: Array de Checkboxes
+  birthDate: string;           
+  contractType: string;       
+  permissions: string[];       
 }

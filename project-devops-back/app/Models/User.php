@@ -1,49 +1,27 @@
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-
-class User extends Authenticatable
+return new class extends Migration
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function up(): void
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        Schema::table('users', function (Blueprint $blueprint) {
+            $blueprint->string('role')->default('User');
+            $blueprint->string('status')->default('Activo');
+            $blueprint->date('birth_date')->nullable();
+            $blueprint->string('contract_type')->nullable();
+            $blueprint->json('permissions')->nullable();
+            $blueprint->string('password')->nullable()->change();
+        });
     }
-}
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $blueprint) {
+            $blueprint->dropColumn(['role', 'status', 'birth_date', 'contract_type', 'permissions']);
+        });
+    }
+};
