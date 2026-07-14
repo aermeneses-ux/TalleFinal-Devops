@@ -77,12 +77,17 @@ export class UserFormComponent implements OnInit {
     'Finanzas'
   ];
 
-
   ngOnInit() {
     this.initForm();
   }
 
   private initForm() {
+    // Si estamos editando, convertimos el string de fecha que viene del backend a un objeto Date para PrimeNG
+    let initialBirthDate: Date | string = '';
+    if (this.userToEdit?.birthDate) {
+      initialBirthDate = new Date(this.userToEdit.birthDate);
+    }
+
     this.userForm = this.fb.group({
       id: [this.userToEdit?.id || null],
       name: [
@@ -94,36 +99,20 @@ export class UserFormComponent implements OnInit {
         [Validators.required, Validators.email],
       ],
       role: [this.userToEdit?.role || 'User', [Validators.required]],
-      status: [this.userToEdit?.status || 'Activo', [Validators.required]], // Por defecto 'Activo' para que no quede vacío
-      birthDate: [this.userToEdit?.birthDate || '', [Validators.required]],
+      status: [this.userToEdit?.status || 'Activo', [Validators.required]],
+      birthDate: [initialBirthDate, [Validators.required]],
       contractType: [
         this.userToEdit?.contractType || 'Tiempo Completo',
         [Validators.required],
       ],
-      permissions: [this.userToEdit?.permissions || []], // Array de strings
+      // 🌟 SOLUCIÓN 1: Nos aseguramos de que por defecto siempre sea un array vacío [] y nunca undefined/null
+      permissions: [this.userToEdit?.permissions || []], 
     });
   }
 
-  // Helper para manejar la lógica de los Checkboxes
-  onCheckboxChange(event: any, permission: string) {
-    const currentPermissions: string[] =
-      this.userForm.get('permissions')?.value || [];
-    if (event.target.checked) {
-      this.userForm
-        .get('permissions')
-        ?.setValue([...currentPermissions, permission]);
-    } else {
-      this.userForm
-        .get('permissions')
-        ?.setValue(currentPermissions.filter((p) => p !== permission));
-    }
-  }
-
-  // Método auxiliar para saber si un checkbox debe aparecer marcado al editar
-  hasPermission(permission: string): boolean {
-    if (!this.userToEdit || !this.userToEdit.permissions) return false;
-    return this.userToEdit.permissions.includes(permission);
-  }
+  // Ya no necesitas 'onCheckboxChange' ni 'hasPermission' porque p-checkbox de PrimeNG 
+  // gestiona automáticamente la inserción/eliminación de elementos en el array 'permissions' 
+  // usando [value] y formControlName de manera reactiva.
 
   saveUser() {
     if (this.userForm.invalid) {
@@ -131,7 +120,19 @@ export class UserFormComponent implements OnInit {
       return;
     }
 
-    const userData: User = this.userForm.value;
+    // Obtenemos los valores actuales del formulario
+    const rawValues = this.userForm.value;
+
+    // 🌟 SOLUCIÓN 2: Sanitizar y preparar los datos para el backend
+    const userData: User = {
+      ...rawValues,
+      // Aseguramos que 'permissions' sea un array (por si acaso PrimeNG lo alteró a null)
+      permissions: rawValues.permissions || [],
+      // Formateamos la fecha a formato ISO (YYYY-MM-DD) para que no rompa el backend
+      birthDate: rawValues.birthDate instanceof Date 
+        ? rawValues.birthDate.toISOString().split('T')[0] 
+        : rawValues.birthDate
+    };
 
     if (userData.id) {
       this.userService.updateUser(userData);
