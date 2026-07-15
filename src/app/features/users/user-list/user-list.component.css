@@ -1,0 +1,66 @@
+.main-container{
+
+    padding:20px;
+
+}
+
+p-card{
+
+    margin-bottom:50px;
+
+}
+
+:host ::ng-deep .p-tag{
+
+    width:95px;
+    justify-content:center;
+
+}
+
+:host ::ng-deep .p-button{
+
+    margin-right:.3rem;
+
+}
+
+.stats{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:15px;
+
+margin:20px 0;
+
+}
+
+.stat{
+
+background:rgb(255, 13, 13);
+
+padding:20px;
+
+border-radius:12px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+text-align:center;
+
+}
+
+.stat h3{
+
+margin:0;
+
+font-size:28px;
+
+color:#2563eb;
+
+}
+
+.stat span{
+
+color:#64748b;
+
+}
