@@ -16,17 +16,34 @@ class UserController extends Controller
     }
 
     public function store(Request $request) {
-        return User::create($request->all());
+        $data = $this->normalizeRequest($request->all());
+        return User::create($data);
     }
 
     public function update(Request $request, $id) {
         $user = User::findOrFail($id);
-        $user->update($request->all());
+        $data = $this->normalizeRequest($request->all());
+        $user->update($data);
         return $user;
     }
 
     public function destroy($id) {
         User::destroy($id);
         return response()->json(['message' => 'Deleted']);
+    }
+
+    private function normalizeRequest(array $input): array
+    {
+        if (array_key_exists('birthDate', $input)) {
+            $input['birth_date'] = $input['birthDate'];
+            unset($input['birthDate']);
+        }
+
+        if (array_key_exists('contractType', $input)) {
+            $input['contract_type'] = $input['contractType'];
+            unset($input['contractType']);
+        }
+
+        return $input;
     }
 }

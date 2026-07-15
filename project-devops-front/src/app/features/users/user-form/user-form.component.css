@@ -2,24 +2,27 @@
     border-radius:18px;
     overflow:hidden;
     box-shadow:0 20px 60px rgba(0,0,0,.18);
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
 }
 
 :host ::ng-deep .p-dialog-header{
     padding:1.3rem 1.8rem;
-    border-bottom:1px solid #ececec;
-    background:#fafafa;
+    border-bottom:1px solid var(--border);
+    background: var(--header-bg);
 }
 
 :host ::ng-deep .p-dialog-title{
     font-size:1.35rem;
     font-weight:700;
-    color:#1f2937;
+    color: var(--text-main);
 }
 
 :host ::ng-deep .p-dialog-content{
     padding:2rem;
     overflow-y: auto;
     max-height: calc(100vh - 180px);
+    background: var(--bg-card);
 }
 
 .form-grid{
@@ -73,21 +76,13 @@ label{
 }
 
 .options{
-
     display:flex;
-
     flex-direction:column;
-
     gap:.9rem;
-
     padding:.8rem;
-
-    border:1px solid #e5e7eb;
-
+    border:1px solid var(--input-border);
     border-radius:10px;
-
-    background:#fafafa;
-
+    background: var(--input-bg);
 }
 
 .option{

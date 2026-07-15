@@ -22,6 +22,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'status',
+        'birth_date',
+        'contract_type',
+        'permissions',
     ];
 
     /**
@@ -35,7 +40,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -44,6 +49,25 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date:Y-m-d',
+            'permissions' => 'array',
         ];
+    }
+
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+
+        if (array_key_exists('birth_date', $data)) {
+            $data['birthDate'] = $data['birth_date'];
+            unset($data['birth_date']);
+        }
+
+        if (array_key_exists('contract_type', $data)) {
+            $data['contractType'] = $data['contract_type'];
+            unset($data['contract_type']);
+        }
+
+        return $data;
     }
 }

@@ -155,17 +155,21 @@
           <button
             pButton
             rounded
-            text
             severity="info"
+            icon="pi pi-pencil"
+            label="Editar"
             (click)="openEditForm(user)"
+            class="action-button"
           ></button>
 
           <button
             pButton
             rounded
-            text
             severity="danger"
+            icon="pi pi-trash"
+            label="Eliminar"
             (click)="deleteUser(user.id!)"
+            class="action-button"
           ></button>
         </td>
       </tr>

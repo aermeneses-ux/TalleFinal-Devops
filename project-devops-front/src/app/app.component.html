@@ -1,7 +1,18 @@
 <main class="main-layout">
-  <h1>  </h1>
-  <br>
-  
+  <header class="app-header">
+    <div class="brand">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">Panel de control para la gestión de usuarios</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-primary theme-btn"
+      (click)="toggleTheme()"
+    >
+      {{ isDarkTheme ? 'Tema Claro ☀️' : 'Tema Oscuro 🌙' }}
+    </button>
+  </header>
+
   <app-user-list></app-user-list>
-  
 </main>
