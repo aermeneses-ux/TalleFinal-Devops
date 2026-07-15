@@ -135,7 +135,7 @@
         </td>
 
         <td>
-          {{ user.permissions.join(", ") }}
+          {{ user.permissions?.join(", ") || 'Ninguno' }}
         </td>
 
         <td>
@@ -145,9 +145,7 @@
 
         <td>
           <p-toggleswitch
-            [(ngModel)]="user.status"
-            [trueValue]="'Activo'"
-            [falseValue]="'Inactivo'"
+            [ngModel]="user.status === 'Activo'"
             (onChange)="toggleStatus(user)"
           >
           </p-toggleswitch>
@@ -184,6 +182,7 @@
     <app-user-form
       [userToEdit]="selectedUser"
       (onClose)="closeForm()"
+      (onSave)="handleSaveSuccess($event)"
     ></app-user-form>
   }
 </div>
