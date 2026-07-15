@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
@@ -15,11 +15,8 @@ import { TagModule } from 'primeng/tag';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 
-import { ConfirmationService } from 'primeng/api';
-import { MessageService } from 'primeng/api';
-
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
 
 @Component({
@@ -40,15 +37,15 @@ import { SelectModule } from 'primeng/select';
     ToggleSwitchModule,
     ConfirmDialogModule,
     ToastModule,
-    SelectModule,
-    ConfirmDialog,
+    SelectModule
   ],
+  // 🌟 Agregamos los proveedores locales de PrimeNG para evitar errores de inyección
+  providers: [ConfirmationService, MessageService],
   templateUrl: './user-list.component.html',
 })
-export class UserListComponent {
+export class UserListComponent implements OnInit {
   private userService = inject(UserService);
   private confirmationService = inject(ConfirmationService);
-
   private messageService = inject(MessageService);
 
   // Obtenemos el Signal directamente del servicio
@@ -64,6 +61,11 @@ export class UserListComponent {
     { label: 'Guest', value: 'Guest' },
   ];
 
+  ngOnInit() {
+    // Cargamos los usuarios al iniciar el componente
+    this.userService.fetchUsers();
+  }
+
   openCreateForm() {
     this.selectedUser = null;
     this.isFormOpen = true;
@@ -74,25 +76,37 @@ export class UserListComponent {
     this.isFormOpen = true;
   }
 
+  // 🌟 Captura cuando el Formulario hijo guarda correctamente
+  handleSaveSuccess(action: 'create' | 'update') {
+    this.isFormOpen = false;
+    this.selectedUser = null;
+
+    // Alerta de éxito
+    this.messageService.add({
+      severity: 'success',
+      summary: action === 'create' ? 'Usuario Creado' : 'Usuario Actualizado',
+      detail: action === 'create' 
+        ? 'El usuario se registró correctamente' 
+        : 'Los cambios fueron guardados con éxito',
+      life: 3000
+    });
+  }
+
   deleteUser(id: number) {
     this.confirmationService.confirm({
       header: 'Eliminar Usuario',
-
-      message: '¿Desea eliminar este usuario?',
-
+      message: '¿Está seguro de que desea eliminar este usuario?',
       icon: 'pi pi-exclamation-triangle',
-
       acceptButtonStyleClass: 'p-button-danger',
-
       accept: () => {
         this.userService.deleteUser(id);
 
+        // Alerta de éxito al eliminar
         this.messageService.add({
           severity: 'success',
-
           summary: 'Usuario eliminado',
-
           detail: 'El registro fue eliminado correctamente',
+          life: 3000
         });
       },
     });
@@ -104,53 +118,40 @@ export class UserListComponent {
   }
 
   toggleStatus(user: User) {
-    user.status = user.status === 'Activo' ? 'Inactivo' : 'Activo';
+    // Cambiamos el estado reactivamente
+    const nuevoEstado: 'Activo' | 'Inactivo' = user.status === 'Activo' ? 'Inactivo' : 'Activo';
+    const updatedUser = { ...user, status: nuevoEstado };
 
-    this.userService.updateUser(user);
+    this.userService.updateUser(updatedUser);
+
+    // Alerta de cambio de estado rápido
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Estado Actualizado',
+      detail: `Usuario ahora está ${nuevoEstado}`,
+      life: 2000
+    });
   }
 
   getRoleSeverity(role: string) {
     switch (role) {
-      case 'Admin':
-        return 'danger';
-
-      case 'User':
-        return 'info';
-
-      case 'Guest':
-        return 'secondary';
-
-      default:
-        return 'contrast';
+      case 'Admin': return 'danger';
+      case 'User': return 'info';
+      case 'Guest': return 'secondary';
+      default: return 'contrast';
     }
   }
 
-  saveUser() {
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Usuario creado',
-      detail: 'El usuario se guardó correctamente',
-    });
-
-    this.messageService.add({
-      severity: 'info',
-
-      summary: 'Usuario actualizado',
-
-      detail: 'Cambios guardados',
-    });
+  // Getters para las estadísticas de la cabecera
+  get activeUsers(): number {
+    return this.users().filter(user => user.status === 'Activo').length;
   }
 
+  get inactiveUsers(): number {
+    return this.users().filter(user => user.status === 'Inactivo').length;
+  }
 
-  get activeUsers(): number {
-  return this.users().filter(user => user.status === 'Activo').length;
-}
-
-get inactiveUsers(): number {
-  return this.users().filter(user => user.status === 'Inactivo').length;
-}
-
-get adminUsers(): number {
-  return this.users().filter(user => user.role === 'Admin').length;
-}
+  get adminUsers(): number {
+    return this.users().filter(user => user.role === 'Admin').length;
+  }
 }

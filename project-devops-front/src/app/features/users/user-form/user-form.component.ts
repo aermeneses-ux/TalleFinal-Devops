@@ -26,6 +26,7 @@ import { FluidModule } from 'primeng/fluid';
 
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'app-user-form',
   standalone: true,
@@ -40,7 +41,7 @@ import { FormsModule } from '@angular/forms';
     CheckboxModule,
     ButtonModule,
     FluidModule,
-    FormsModule,
+    FormsModule
   ],
   styleUrl: './user-form.component.css',
   templateUrl: './user-form.component.html',
@@ -51,6 +52,8 @@ export class UserFormComponent implements OnInit {
 
   @Input() userToEdit: User | null = null;
   @Output() onClose = new EventEmitter<void>();
+
+@Output() onSave = new EventEmitter<'create' | 'update'>();
 
   userForm!: FormGroup;
 
@@ -115,31 +118,36 @@ export class UserFormComponent implements OnInit {
   // usando [value] y formControlName de manera reactiva.
 
   saveUser() {
-    if (this.userForm.invalid) {
-      this.userForm.markAllAsTouched();
-      return;
-    }
-
-    // Obtenemos los valores actuales del formulario
-    const rawValues = this.userForm.value;
-
-    // 🌟 SOLUCIÓN 2: Sanitizar y preparar los datos para el backend
-    const userData: User = {
-      ...rawValues,
-      // Aseguramos que 'permissions' sea un array (por si acaso PrimeNG lo alteró a null)
-      permissions: rawValues.permissions || [],
-      // Formateamos la fecha a formato ISO (YYYY-MM-DD) para que no rompa el backend
-      birthDate: rawValues.birthDate instanceof Date 
-        ? rawValues.birthDate.toISOString().split('T')[0] 
-        : rawValues.birthDate
-    };
-
-    if (userData.id) {
-      this.userService.updateUser(userData);
-    } else {
-      this.userService.createUser(userData);
-    }
-
-    this.onClose.emit(); // Cerrar formulario al terminar
+  if (this.userForm.invalid) {
+    this.userForm.markAllAsTouched();
+    return;
   }
+
+  const rawValues = this.userForm.value;
+
+  const userData: User = {
+    ...rawValues,
+    permissions: rawValues.permissions || [],
+  };
+
+  if (rawValues.birthDate) {
+    const date = new Date(rawValues.birthDate);
+    if (!isNaN(date.getTime())) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      userData.birthDate = `${year}-${month}-${day}`;
+    } else {
+      userData.birthDate = ''; 
+    }
+  }
+
+  if (userData.id) {
+    this.userService.updateUser(userData);
+    this.onSave.emit('update'); // 🌟 Notifica que se actualizó
+  } else {
+    this.userService.createUser(userData);
+    this.onSave.emit('create'); // 🌟 Notifica que se creó nuevo
+  }
+}
 }

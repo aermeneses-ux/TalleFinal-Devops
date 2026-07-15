@@ -21,7 +21,16 @@ jobs:
           password: ${{ secrets.VPS_PASS }}
           script: |
             cd /root/proyecto
-            git pull origin main
+            
+            # 1. Descargamos los últimos cambios de GitHub sin intentar fusionarlos todavía
+            git fetch origin main
+            
+            # 2. Forzamos a la VPS a alinearse exactamente con lo que hay en GitHub,
+            # descartando cualquier cambio o conflicto local en el servidor
+            git reset --hard origin/main
+            
+            # 3. Detenemos los contenedores antiguos
             docker-compose down
+            
+            # 4. Construimos e iniciamos los contenedores con los nuevos cambios
             docker-compose up -d --build
-
