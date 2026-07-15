@@ -143,17 +143,17 @@ services:
       - "traefik.http.routers.pgadmin-http.rule=Host(`pgyumbo.byronrm.com`)"
       - "traefik.http.routers.pgadmin-http.entrypoints=web"
       - "traefik.http.routers.pgadmin-http.middlewares=redirect-to-https"
-    # === 🚀 SOLUCIÓN: PERSISTENCIA PARA PGADMIN ===
+    # ===  SOLUCIÓN: PERSISTENCIA PARA PGADMIN ===
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - proxy-net
 
-# === 🚀 SOLUCIÓN: AGREGAMOS EL VOLUMEN AQUÍ ===
+# ===  SOLUCIÓN: AGREGAMOS EL VOLUMEN AQUÍ ===
 volumes:
   portainer_data:
   postgres_data:
-  pgadmin_data: # 👈 ¡Este volumen guardará tus servidores y configuraciones!
+  pgadmin_data: 
 
 networks:
   proxy-net:
